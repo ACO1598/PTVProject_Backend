@@ -1,0 +1,6 @@
+es\loyola\iitv\ptv\Connection\ManagerMongoDB.class
+es\loyola\iitv\ptv\servlets\registroServlet.class
+es\loyola\iitv\ptv\DAO\DAOMongoDB.class
+es\loyola\iitv\ptv\servlets\inicioSesionServlet.class
+es\loyola\iitv\ptv\Connection\ManagerConnection.class
+es\loyola\iitv\ptv\DAO\User.class

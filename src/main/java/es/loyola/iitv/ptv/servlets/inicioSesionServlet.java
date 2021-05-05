@@ -1,6 +1,5 @@
 package es.loyola.iitv.ptv.servlets;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.stream.Collectors;
@@ -11,19 +10,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.bson.Document;
-import org.json.HTTP;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-
-import es.loyola.iitv.ptv.Connection.ManagerMongoDB;
 import es.loyola.iitv.ptv.DAO.User;
+
 
 @WebServlet(urlPatterns="/inicioSesion")
 public class inicioSesionServlet extends HttpServlet{
@@ -34,29 +24,66 @@ public class inicioSesionServlet extends HttpServlet{
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		resp.setContentType("text/plain");//TODO cambiar a JSON
+	public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		resp.setContentType("application/json");
 		PrintWriter writer= resp.getWriter();
+		JSONObject respuesta= new JSONObject();
 		
-		String test = req.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-		//Conexion desde otro servlet
+		//Code made for testing
+		String request= req.getParameter("request");
 		
-		//TODO añadir try catch para excepcion del constructor
-		User user= new User();
-		user.getLoginData(test);
+//		User usuario= new User(request);
+//		
+//		String test = req.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+		
+		System.out.println(request);
 
-		//TODO Debe devolver un User
-		Document docLoginData= ManagerMongoDB.getLoginData(user.getUsuario());
-		if(docLoginData != null) {
-			if(docLoginData.getString("Dni").equals(user.getUsuario()) && docLoginData.getString("Password").equals(user.getPassword())) {
-				writer.write("{\"status\": \"Login Correcto\"}");
-			}else {
-				writer.write("{\"status\": \"Login Incorrecto\"}");
+		String aux = "";
+		User usuario;
+		try {
+			if(request != null) {
+				usuario= new User(request);
+			} else {
+				usuario= new User();
 			}
-		}else {
+			System.out.println(usuario);
+			respuesta.put("status", usuario);
 			
-			writer.write("{\"status\": \"Login Incorrecto\"}");
+		}catch (ClassCastException e) {
+			respuesta.put("status", e.toString());
+			aux = aux + e;
+			JSONObject result= new JSONObject();
+			result.put("errormsg", "Al crear User: " + e);
+			//respuesta.put("result", result);
 		}
+		
+
+//		User userLoginData= ConsultasMongoDB.getLoginData(user.getDni());
+		
+//		if(userLoginData != null) {
+//			if(userLoginData.getPassword().equals(user.getPassword()) && userLoginData.getEmail().equals(user.getEmail())) {
+//				if(ConsultasMongoDB.updateLoginDoc(userLoginData) == true) {
+//					respuesta.put("status", "ok");
+//					JSONObject result= new JSONObject();
+//					//result.put("msg", "login succesfull");
+//					//result.put("User data", userLoginData);
+//					//respuesta.put("result", result);
+//				}else {
+//					respuesta.put("status", "Error");
+////					respuesta.put("result", "Error al actualizar loginData");
+//				}
+//			}else {
+//				respuesta.put("status", "Error");
+////				respuesta.put("result", "Incorrect password or User");
+//			}
+//		}else {
+//			respuesta.put("status", "Error");
+////			respuesta.put("respuesta", "DB error");
+//		}
+
+		//for testing
+//		respuesta.put("status", usuario);
+		writer.write(respuesta.toString());
 	}
 	
 	

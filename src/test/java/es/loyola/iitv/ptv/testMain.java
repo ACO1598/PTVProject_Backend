@@ -13,6 +13,9 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoCollection;
 
 import org.bson.Document;
+import org.json.JSONObject;
+import org.junit.Test;
+
 import java.util.Arrays;
 
 import com.mongodb.BasicDBObject;
@@ -23,32 +26,61 @@ import static com.mongodb.client.model.Filters.*;
 import com.mongodb.client.result.DeleteResult;
 import static com.mongodb.client.model.Updates.*;
 import com.mongodb.client.result.UpdateResult;
+import org.mockito.Mock;
+import static org.mockito.Mockito.mock;
+
+import static org.junit.Assert.assertTrue;
+import org.junit.Test;
+import static org.mockito.Mockito.when;
 
 import es.loyola.iitv.ptv.Connection.ManagerConnection;
+import es.loyola.iitv.ptv.DAO.User;
+import es.loyola.iitv.ptv.servlets.inicioSesionServlet;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 public class testMain {
 
-	public static void main(String[] args) {
-		MongoClient client = ManagerConnection.doConnectionMongo();
+	@Test
+	public void test() throws IOException, ServletException{
+		HttpServletRequest request= mock(HttpServletRequest.class);
+		HttpServletResponse response= mock(HttpServletResponse.class);
 		
-		MongoDatabase database = client.getDatabase("examples");
-		MongoCollection<org.bson.Document> inventory = database.getCollection("inventory");
-		MongoCollection<org.bson.Document> users = database.getCollection("users");
+//		when(request.getParameter("email")).thenReturn("testing@gmail.com");
+//		when(request.getParameter("password")).thenReturn("");
+		JSONObject jsonRequest= new JSONObject();
+		jsonRequest.put("usuario", "testing");
+		jsonRequest.put("password", "1234");
+		when(request.getParameter("request")).thenReturn(jsonRequest.toString());
 		
+		StringWriter stringWriter= new StringWriter();
+		PrintWriter writer= new PrintWriter(stringWriter);
 		
-		BasicDBObject dbo = new BasicDBObject("FirstName","NombreAlumno1");
-		Document doc= users.find(dbo).first();
+		when(response.getWriter()).thenReturn(writer);
 		
-		Document myDoc = inventory.find().first();
+		new inicioSesionServlet().doPost(request, response);
 		
+		System.out.println("Inicio sesion: " + stringWriter.toString());
+	}
+	
+	@Test
+	public void testToken() {
+		User usuario= new User();
+		String token= usuario.generarToken();
 		
-		//FindIterable<Document> findPublisher= inventory.find(new Document());
-		//Document yoyo = inventory.find
+		System.out.println(token);
+	}
+	
+	@Test 
+	public void testupdateloginData() {
 		
-		//System.out.println(doc.toString());
-		//System.out.println(myDoc.toString());
 	}
 }

@@ -37,26 +37,26 @@ public class registroServlet extends HttpServlet{
 		resp.setContentType("application/json");
 		PrintWriter writer= resp.getWriter();
 		
-		String test = req.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-		User user= new User();
-		user.makeUser(test);
-
-		Document doc= ManagerMongoDB.getLoginData(user.getUsuario());
-		JSONObject respuesta= new JSONObject();
-		if (doc.isEmpty()){
-			Document newlogindata= new Document("Dni", user.getUsuario()).append("Password", user.getUsuario());
-			ManagerMongoDB.setLoginData(newlogindata);
-			
-			respuesta.put("code", "ok");
-			respuesta.put("message", user.getUsuario());
-			respuesta.put("result", "User registered");
-			writer.write(respuesta.toString());
-			
-		}else if (doc.get("Dni").toString().equals(user.getUsuario())) {
-			respuesta.put("code", "not ok");
-			respuesta.put("message", "There is another user with those credentials");
-			respuesta.put("result", "User not registered");
-			writer.write(respuesta.toString());
-		}
+//		String test = req.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+//		User user= new User();
+//		user.makeUser(test);
+//
+//		Document doc= ManagerMongoDB.getLoginData(user.getUsuario());
+//		JSONObject respuesta= new JSONObject();
+//		if (doc.isEmpty()){
+//			Document newlogindata= new Document("Dni", user.getUsuario()).append("Password", user.getUsuario());
+//			ManagerMongoDB.setLoginData(newlogindata);
+//			
+//			respuesta.put("code", "ok");
+//			respuesta.put("message", user.getUsuario());
+//			respuesta.put("result", "User registered");
+//			writer.write(respuesta.toString());
+//			
+//		}else if (doc.get("Dni").toString().equals(user.getUsuario())) {
+//			respuesta.put("code", "not ok");
+//			respuesta.put("message", "There is another user with those credentials");
+//			respuesta.put("result", "User not registered");
+//			writer.write(respuesta.toString());
+//		}
 	}
 }

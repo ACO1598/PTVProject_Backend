@@ -8,9 +8,9 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
 public class ManagerMongoDB extends ManagerConnection{
-	//TODO poner los nombres de bases y colecciones por variables
 	static String databaseMongoDB= "examples";
 	static String collectionLoginData= "logindata";
+	static String collectionUsers= "users";
 	
 	public ManagerMongoDB() {
 		
@@ -22,6 +22,14 @@ public class ManagerMongoDB extends ManagerConnection{
 		MongoCollection<org.bson.Document> logindata = database.getCollection(collectionLoginData);
 		
 		return logindata;
+	}
+	
+	public static MongoCollection<org.bson.Document> getusersCollection(){
+		MongoClient client= ManagerConnection.doConnectionMongo();
+		MongoDatabase database = client.getDatabase(databaseMongoDB);
+		MongoCollection<org.bson.Document> data = database.getCollection(collectionUsers);
+		
+		return data;
 	}
 	
 	public static boolean setLoginData(Document doc) {

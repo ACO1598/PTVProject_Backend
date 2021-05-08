@@ -8,7 +8,7 @@ import java.util.Base64.Encoder;
 import org.json.JSONObject;
 
 public class User {
-	private String dni, firstname, lastname, email, password, rpassword;
+	private String dni, firstname, lastname, email, password;
 	private String token, lastAction, rol;
 	
 	public User() {
@@ -17,7 +17,6 @@ public class User {
 		this.setLastname("");
 		this.setEmail("");
 		this.setPassword("");
-		this.setRpassword("");
 		this.setToken("");
 		this.setLastAction("");
 		this.setRol("");
@@ -29,7 +28,6 @@ public class User {
 			JSONObject json = new JSONObject(data);
 			String dni="";
 			String password= "";
-			String repPassword= "";
 			String email= "";
 			String firstname= "";
 			String lastname= "";
@@ -37,10 +35,10 @@ public class User {
 			String lastAction= "";
 			String rol="";
 
-			if(json.has("usuario")) {
-				dni = json.getString("usuario");
-				System.out.println(dni);
+			if(json.has("dni")) {
+				dni = json.getString("dni");
 				if(!dni.isEmpty()) {
+					//TODO comprobar si dni es valido, modulo 23, formula calcular NIF a%23
 					this.setDni(dni);
 				}else {
 					throw new ClassCastException("Error al copiar el dni");
@@ -54,16 +52,8 @@ public class User {
 					throw new ClassCastException("Error al copiar el password");
 				}
 			}
-			if(json.has("rpassword")) {
-				repPassword= json.getString("rpassword");
-				if(!repPassword.isEmpty()) {
-					this.setRpassword(repPassword);
-				}else {
-					throw new ClassCastException("Error al copiar el repPassword");
-				}
-			}
-			if(json.has("email")) {
-				email=  json.getString("email");
+			if(json.has("usuario")) {
+				email=  json.getString("usuario");
 				if(!email.isEmpty()) {
 					this.setEmail(email);
 				}else {
@@ -110,23 +100,29 @@ public class User {
 					throw new ClassCastException("Error al copiar el token");
 				}
 			}
-			System.out.println("Usuario creado");
+			
 		}else {
 			throw new ClassCastException("data is empty");
 		}
 	}
 
-	public User(String email, String password) {
+	public User(String email, String password, String lastAction, String rol, String token) {
 		if(email != null) {
 			this.setEmail(email);
 		}else {
-			throw new ClassCastException("Error al copiar la repeticion del password");
+			throw new ClassCastException("Error al copiar el email");
 		}
 		if(password != null) {
 			this.setPassword(password);
 		}else {
 			throw new ClassCastException("Error al copiar el password");
 		}
+		this.setLastAction(lastAction);
+		this.setRol(rol);
+		this.setToken(token);
+		this.setDni("");
+		this.setFirstname("");
+		this.setLastname("");
 	}
 	
 	public User(String dni, String pass, String firstname, String lastname, String email,
@@ -139,6 +135,11 @@ public class User {
 		this.setRol(rol);
 		this.setLastAction(lastAction);
 		this.setToken(token);
+	}
+	
+	//TODO Unificamos los users de login y Users
+	public User(User userlogin, User userUsers) throws ClassCastException{
+		
 	}
 	
 	public String generarToken() {
@@ -188,14 +189,6 @@ public class User {
 
 	public void setEmail(String email) {
 		this.email = email;
-	}
-
-	public String getRpassword() {
-		return rpassword;
-	}
-
-	public void setRpassword(String rpassword) {
-		this.rpassword = rpassword;
 	}
 
 	public String getRol() {

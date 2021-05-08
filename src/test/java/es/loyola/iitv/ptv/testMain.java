@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import static org.mockito.Mockito.when;
 
-import es.loyola.iitv.ptv.Connection.ManagerConnection;
+import es.loyola.iitv.ptv.Connection.ConsultasMongoDB;
 import es.loyola.iitv.ptv.DAO.User;
 import es.loyola.iitv.ptv.servlets.inicioSesionServlet;
 
@@ -54,11 +54,9 @@ public class testMain {
 		HttpServletRequest request= mock(HttpServletRequest.class);
 		HttpServletResponse response= mock(HttpServletResponse.class);
 		
-//		when(request.getParameter("email")).thenReturn("testing@gmail.com");
-//		when(request.getParameter("password")).thenReturn("");
 		JSONObject jsonRequest= new JSONObject();
-		jsonRequest.put("usuario", "testing");
-		jsonRequest.put("password", "1234");
+		jsonRequest.put("usuario", "emailProfesor1@gmail.com");
+		jsonRequest.put("password", "NombreAlumno3");
 		when(request.getParameter("request")).thenReturn(jsonRequest.toString());
 		
 		StringWriter stringWriter= new StringWriter();
@@ -69,6 +67,8 @@ public class testMain {
 		new inicioSesionServlet().doPost(request, response);
 		
 		System.out.println("Inicio sesion: " + stringWriter.toString());
+		
+		
 	}
 	
 	@Test
@@ -81,6 +81,21 @@ public class testMain {
 	
 	@Test 
 	public void testupdateloginData() {
+		User usuario= new User("emailProfesor1@gmail.com", "NombreAlumno3", "", "", "");
 		
+		Boolean result= ConsultasMongoDB.updateLoginDoc(usuario);
+		
+		System.out.println(result);
+	}
+	
+	@Test
+	public void testgetLoginData() {
+		String emailUser= "emailProfesor1@gmail.com";
+		
+		User usuario= ConsultasMongoDB.getLoginData(emailUser);
+		
+		System.out.println(usuario.getDni());
+		System.out.println(usuario.getEmail());
+		System.out.println(usuario.getPassword());
 	}
 }

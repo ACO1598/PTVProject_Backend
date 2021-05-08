@@ -22,17 +22,48 @@ public class ConsultasMongoDB {
 		
 	}
 	
-		public static User getLoginData(String dniUser) {
+		public static User getLoginData(String emailUser) {
+			//Primero obtenemos los datos del login data
 			MongoCollection<org.bson.Document> logindata = ManagerMongoDB.getloginCollection();
 			
-			BasicDBObject dbo = new BasicDBObject("Dni",dniUser);
-			Document doc= logindata.find(dbo).first();
+			BasicDBObject dbo = new BasicDBObject("email",emailUser);
+			Document docLogin= logindata.find(dbo).first();
 			
-			String email= doc.get("email").toString();
-			String password= doc.getString("Password");
+			User user= new User();
+			String email, password, lastAction, rol, token;
 			
-			User user= new User(email, password);
+			if(docLogin != null) {
+				email= docLogin.getString("email");
+				password= docLogin.getString("Password");
+				lastAction= docLogin.getString("LastAction");
+				rol= docLogin.getString("LastAction");
+				token= docLogin.getString("LastAction");
+				System.out.println("datos doc: " + email + " " + password);
+				
+				user= new User(email, password, lastAction, rol, token);
+				
+			}else {
+				throw new ClassCastException("User not found in loginData");
+			}
 			
+			return user;
+		}
+		
+		public static User getUserData(String emailUser) {
+			MongoCollection<org.bson.Document> userdata = ManagerMongoDB.getusersCollection();
+			BasicDBObject dbo = new BasicDBObject("email",emailUser);
+			Document docUser= userdata.find(dbo).first();
+			String firstname, lastname, dni;
+			
+			if(docUser != null) {
+				firstname= docUser.getString("Firstname");
+				lastname= docUser.getString("LastName");
+				dni= docUser.getString("Dni");
+			}else {
+				throw new ClassCastException("User not found in Users");
+			}
+			
+			User user= new User(dni, "", firstname, lastname, emailUser, "", "", "");
 			return user;
 		}
 
@@ -41,6 +72,8 @@ public class ConsultasMongoDB {
 			
 			String emailuser= userlogindata.getEmail();
 			String currentTime= LocalDate.now().toString();
+			String token= userlogindata.getToken();
+			logindata.updateOne(eq("email", emailuser), set("Token", token));
 			UpdateResult result= logindata.updateOne(eq("email", emailuser), set("LastAction", currentTime));
 			if(result.wasAcknowledged()) {
 				return true;

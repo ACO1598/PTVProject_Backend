@@ -29,21 +29,27 @@ public class ConsultasMongoDB {
 			BasicDBObject dbo = new BasicDBObject("email",emailUser);
 			Document docLogin= logindata.find(dbo).first();
 			
-			User user= new User();
-			String email, password, lastAction, rol, token;
+			User user= null;
+			String email= "", password="", lastAction="", rol="", token="";
 			
-			if(docLogin != null) {
-				email= docLogin.getString("email");
-				password= docLogin.getString("Password");
-				lastAction= docLogin.getString("LastAction");
-				rol= docLogin.getString("LastAction");
-				token= docLogin.getString("LastAction");
-				System.out.println("datos doc: " + email + " " + password);
+			if(docLogin != null && !docLogin.isEmpty()) {
+				if(docLogin.containsKey("email")) {
+					email= docLogin.getString("email");
+				}
+				if(docLogin.containsKey("Password")) {
+					password= docLogin.getString("Password");
+				}
+				if(docLogin.containsKey("LastAction")) {
+					lastAction= docLogin.getString("LastAction");
+				}
+				if(docLogin.containsKey("Rol")) {
+					rol= docLogin.getString("Rol");
+				}
+				if(docLogin.containsKey("Token")) {
+					token= docLogin.getString("Token");
+				}
 				
 				user= new User(email, password, lastAction, rol, token);
-				
-			}else {
-				throw new ClassCastException("User not found in loginData");
 			}
 			
 			return user;
@@ -53,17 +59,22 @@ public class ConsultasMongoDB {
 			MongoCollection<org.bson.Document> userdata = ManagerMongoDB.getusersCollection();
 			BasicDBObject dbo = new BasicDBObject("email",emailUser);
 			Document docUser= userdata.find(dbo).first();
-			String firstname, lastname, dni;
+			String firstname="", lastname="", dni="";
+			User user= null;
 			
-			if(docUser != null) {
-				firstname= docUser.getString("Firstname");
-				lastname= docUser.getString("LastName");
-				dni= docUser.getString("Dni");
-			}else {
-				throw new ClassCastException("User not found in Users");
+			if(docUser != null && !docUser.isEmpty()) {
+				if(docUser.containsKey("FirstName")) {
+					firstname= docUser.getString("Firstname");
+				}
+				if(docUser.containsKey("LastName")) {
+					lastname= docUser.getString("LastName");
+				}
+				if(docUser.containsKey("Dni")) {
+					dni= docUser.getString("Dni");
+				}
+				
+				user= new User(dni, "", firstname, lastname, emailUser, "", "", "");
 			}
-			
-			User user= new User(dni, "", firstname, lastname, emailUser, "", "", "");
 			return user;
 		}
 
@@ -73,10 +84,11 @@ public class ConsultasMongoDB {
 			String emailuser= userlogindata.getEmail();
 			String currentTime= LocalDate.now().toString();
 			String token= userlogindata.getToken();
-			logindata.updateOne(eq("email", emailuser), set("Token", token));
-			UpdateResult result= logindata.updateOne(eq("email", emailuser), set("LastAction", currentTime));
-			if(result.wasAcknowledged()) {
-				return true;
+			if((emailuser != null && emailuser != "") || (token != null && token != "")) {
+				logindata.updateOne(eq("email", emailuser), set("Token", token));
+				UpdateResult result= logindata.updateOne(eq("email", emailuser), set("LastAction", currentTime));
+				
+				return result.wasAcknowledged();
 			}else {
 				return false;
 			}

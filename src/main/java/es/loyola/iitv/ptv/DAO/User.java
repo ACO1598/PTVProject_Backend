@@ -22,9 +22,8 @@ public class User {
 		this.setRol("");
 	}
 	
-	public User(String data) throws ClassCastException{
+	public User(String data) throws NullPointerException{
 		if(data != null) {
-			System.out.println("Creando usuario with: " + data);
 			JSONObject json = new JSONObject(data);
 			String dni="";
 			String password= "";
@@ -35,13 +34,13 @@ public class User {
 			String lastAction= "";
 			String rol="";
 
-			if(json.has("dni")) {
-				dni = json.getString("dni");
+			if(json.has("Dni")) {
+				dni = json.getString("Dni");
 				if(!dni.isEmpty()) {
 					//TODO comprobar si dni es valido, modulo 23, formula calcular NIF a%23
 					this.setDni(dni);
 				}else {
-					throw new ClassCastException("Error al copiar el dni");
+					throw new NullPointerException("Error al copiar el dni");
 				}
 			}
 			if(json.has("password")) {
@@ -49,31 +48,31 @@ public class User {
 				if(!password.isEmpty()) {
 					this.setPassword(password);
 				}else {
-					throw new ClassCastException("Error al copiar el password");
+					throw new NullPointerException("Error al copiar el password");
 				}
 			}
-			if(json.has("usuario")) {
-				email=  json.getString("usuario");
+			if(json.has("user")) {
+				email=  json.getString("user");
 				if(!email.isEmpty()) {
 					this.setEmail(email);
 				}else {
-					throw new ClassCastException("Error al copiar el email");
+					throw new NullPointerException("Error al copiar el email");
 				}
 			}
-			if(json.has("firstName")) {
-				firstname=  json.getString("firstName");
+			if(json.has("FirstName")) {
+				firstname=  json.getString("FirstName");
 				if(!firstname.isEmpty()) {
 					this.setFirstname(firstname);
 				}else {
-					throw new ClassCastException("Error al copiar el email");
+					throw new NullPointerException("Error al copiar el firstName");
 				}
 			}
-			if(json.has("lastName")) {
-				lastname=  json.getString("lastName");
+			if(json.has("LastName")) {
+				lastname=  json.getString("LastName");
 				if(!lastname.isEmpty()) {
 					this.setLastname(lastname);
 				}else {
-					throw new ClassCastException("Error al copiar el email");
+					throw new NullPointerException("Error al copiar el LastName");
 				}
 			}
 			if(json.has("token")) {
@@ -81,7 +80,7 @@ public class User {
 				if(!token.isEmpty()) {
 					this.setToken(token);
 				}else {
-					throw new ClassCastException("Error al copiar el token");
+					throw new NullPointerException("Error al copiar el token");
 				}
 			}
 			if(json.has("lastAction")) {
@@ -89,7 +88,7 @@ public class User {
 				if(!lastAction.isEmpty()) {
 					this.setLastAction(lastAction);
 				}else {
-					throw new ClassCastException("Error al copiar el token");
+					throw new NullPointerException("Error al copiar el LastAction");
 				}
 			}
 			if(json.has("rol")) {
@@ -97,26 +96,18 @@ public class User {
 				if(!rol.isEmpty()) {
 					this.setRol(rol);
 				}else {
-					throw new ClassCastException("Error al copiar el token");
+					throw new NullPointerException("Error al copiar el role");
 				}
 			}
 			
 		}else {
-			throw new ClassCastException("data is empty");
+			throw new NullPointerException("data is empty");
 		}
 	}
 
 	public User(String email, String password, String lastAction, String rol, String token) {
-		if(email != null) {
-			this.setEmail(email);
-		}else {
-			throw new ClassCastException("Error al copiar el email");
-		}
-		if(password != null) {
-			this.setPassword(password);
-		}else {
-			throw new ClassCastException("Error al copiar el password");
-		}
+		this.setEmail(email);
+		this.setPassword(password);
 		this.setLastAction(lastAction);
 		this.setRol(rol);
 		this.setToken(token);

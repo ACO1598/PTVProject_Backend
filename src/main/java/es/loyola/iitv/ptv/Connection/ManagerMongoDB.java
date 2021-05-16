@@ -34,13 +34,28 @@ public class ManagerMongoDB extends ManagerConnection{
 	
 	public static boolean setLoginData(Document doc) {
 		MongoClient client= ManagerConnection.doConnectionMongo();
-		MongoDatabase database = client.getDatabase("examples");
-		MongoCollection<org.bson.Document> logindata = database.getCollection("logindata");
+		MongoDatabase database = client.getDatabase(databaseMongoDB);
+		MongoCollection<org.bson.Document> logindata = database.getCollection(collectionLoginData);
 		
-		logindata.insertOne(doc);
-		
-		return true;
+		if(!doc.isEmpty() && doc.containsKey("email") && doc.containsKey("Password")
+				&& doc.containsKey("Rol") && doc.containsKey("Token") && doc.containsKey("LastAction")) {
+			logindata.insertOne(doc);
+			return true;
+		}else {
+			return false;
+		}
 	}
 	
-	
+	public static boolean setUserData(Document doc) {
+		MongoClient client= ManagerConnection.doConnectionMongo();
+		MongoDatabase database = client.getDatabase(databaseMongoDB);
+		MongoCollection<org.bson.Document> userdata = database.getCollection(collectionUsers);
+		
+		if(!doc.isEmpty() && doc.containsKey("FirstName") && doc.containsKey("LastName") && doc.containsKey("email")) {
+			userdata.insertOne(doc);
+			return true;
+		}else {
+			return false;
+		}
+	}
 }

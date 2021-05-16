@@ -1,1 +1,3 @@
-es\loyola\iitv\ptv\testMain.class
+es\loyola\iitv\ptv\AllTests.class
+es\loyola\iitv\ptv\InicioSesionTest.class
+es\loyola\iitv\ptv\RegistroServletTest.class

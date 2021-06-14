@@ -45,8 +45,8 @@ public class InicioSesionTest {
 		JSONObject resp= new JSONObject(stringWriter.toString());
 		String code= resp.optString("code");
 		if(code.equalsIgnoreCase("ok")) {
-			assertEquals("emailProfesor1@gmail.com", resp.optString("user"));
-			assertEquals("Profesor1", resp.optString("FirstName"));
+			assertEquals("El correo no corresponde", "emailProfesor1@gmail.com", resp.optString("user"));
+			assertEquals("El nombre del usuario no corresponde", "Profesor1", resp.optString("FirstName"));
 		}
 	}
 	

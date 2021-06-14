@@ -34,8 +34,7 @@ public class InicioSesionServlet extends HttpServlet{
 		
 		String request= req.getParameter("request");
 
-		//TODO quitar constructor (no puedo por el catch)
-		User usuario= new User();
+		User usuario= null;
 		
 		try {
 			if(request != null) {
@@ -54,7 +53,7 @@ public class InicioSesionServlet extends HttpServlet{
 							result.put("Token", userLoginData.getToken());
 							result.put("Rol", userLoginData.getRol());
 							respuesta.put("result", result);
-							session.put("User", userLoginData);
+							session.put("User", userLoginData.getEmail());
 							session.put("Token", userLoginData.getToken());
 							session.put("role", userLoginData.getRol());
 							respuesta.put("session", session);
@@ -106,9 +105,6 @@ public class InicioSesionServlet extends HttpServlet{
 			session.put("role", usuario.getRol());
 			respuesta.put("session", session);
 		}
-		
-		System.out.println(request);
-		//Devolvemos el mensaje final
 		writer.write(respuesta.toString());
 	}
 	

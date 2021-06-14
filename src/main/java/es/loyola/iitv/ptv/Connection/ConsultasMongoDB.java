@@ -5,6 +5,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -14,7 +15,12 @@ import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Updates.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
+import es.loyola.iitv.ptv.DAO.Curso;
+import es.loyola.iitv.ptv.DAO.Grupo;
 import es.loyola.iitv.ptv.DAO.User;
 
 public class ConsultasMongoDB {
@@ -94,4 +100,60 @@ public class ConsultasMongoDB {
 			}
 		}
 		
+		public static List<Curso> getCoursesData(String emailuser) {
+			MongoCollection<org.bson.Document> userdata = ManagerMongoDB.getusersCollection();
+			BasicDBObject dbo = new BasicDBObject("email","emailProfesor3@gmail.com");
+			Document docUser= userdata.find(dbo).first();
+			List<Curso> res= new LinkedList<Curso>();
+			
+			if(docUser != null && !docUser.isEmpty()) {
+				if(docUser.containsKey("Courses") && docUser.containsKey("CourseGroups")) {
+					List<Document> cursos= docUser.getList("Courses", Document.class);
+					for(Document curso:cursos){
+						List<Document> grupos= curso.getList("CourseGroups", Document.class);
+						List<Grupo> listgrupos= new LinkedList<Grupo>();
+						
+						for(Document grupo:grupos) {
+							Grupo grup= new Grupo(grupo);
+							grup.setUserId(emailuser);
+							listgrupos.add(grup);
+							String groupName= grupo.getString("GroupName");
+							System.out.println(groupName);
+						}
+						
+						if(curso.containsKey("CourseId") && curso.containsKey("CourseName")) {
+							String id= curso.getString("CourseId");
+							String name= curso.getString("CourseName");
+							
+							res.add(new Curso(id, name, emailuser, listgrupos));
+						}
+					}
+				}
+			}
+			return res;
+		}
+		
+		public static List<User> buscarAlumnos(String CursoId, String GroupName){
+			MongoCollection<org.bson.Document> userdata = ManagerMongoDB.getusersCollection();
+			BasicDBObject dbo = new BasicDBObject("CourseId", CursoId);
+			dbo.append("GroupName", GroupName);
+			List<Document> docUser= userdata.find(dbo).into(new ArrayList<Document>());
+			List<User> Users= new LinkedList<User>();
+			
+			if(docUser != null) {
+				for(Document Duser: docUser) {
+					//TODO comprobar si es profesor o alumno
+					if(Duser.containsKey("FirstName") && Duser.containsKey("LastName") && Duser.containsKey("email")) {
+						String name, lastname, email;
+						name= Duser.getString("FirstName");
+						lastname= Duser.getString("LastName");
+						email= Duser.getString("email");
+						User newUser= new User("", "", name, lastname, email, "", "", "");
+						Users.add(newUser);
+					}
+				}
+			}
+			
+			return Users;
+		}
 }

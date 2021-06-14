@@ -46,7 +46,7 @@ public class RegistroServlet extends HttpServlet{
 		String request= req.getParameter("request");
 		System.out.println(request);
 
-		User usuario= new User();
+		User usuario= null;
 		
 		try {
 			if(request != null) {

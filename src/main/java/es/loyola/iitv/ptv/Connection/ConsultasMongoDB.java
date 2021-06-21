@@ -70,7 +70,7 @@ public class ConsultasMongoDB {
 			
 			if(docUser != null && !docUser.isEmpty()) {
 				if(docUser.containsKey("FirstName")) {
-					firstname= docUser.getString("Firstname");
+					firstname= docUser.getString("FirstName");
 				}
 				if(docUser.containsKey("LastName")) {
 					lastname= docUser.getString("LastName");
@@ -102,23 +102,20 @@ public class ConsultasMongoDB {
 		
 		public static List<Curso> getCoursesData(String emailuser) {
 			MongoCollection<org.bson.Document> userdata = ManagerMongoDB.getusersCollection();
-			BasicDBObject dbo = new BasicDBObject("email","emailProfesor3@gmail.com");
+			BasicDBObject dbo = new BasicDBObject("email",emailuser);
 			Document docUser= userdata.find(dbo).first();
 			List<Curso> res= new LinkedList<Curso>();
 			
-			if(docUser != null && !docUser.isEmpty()) {
-				if(docUser.containsKey("Courses") && docUser.containsKey("CourseGroups")) {
+			if(docUser != null ) {
+				
 					List<Document> cursos= docUser.getList("Courses", Document.class);
 					for(Document curso:cursos){
 						List<Document> grupos= curso.getList("CourseGroups", Document.class);
 						List<Grupo> listgrupos= new LinkedList<Grupo>();
 						
 						for(Document grupo:grupos) {
-							Grupo grup= new Grupo(grupo);
-							grup.setUserId(emailuser);
+							Grupo grup= new Grupo(grupo.getString("GroupName"), grupo.getString("GroupDescription"));
 							listgrupos.add(grup);
-							String groupName= grupo.getString("GroupName");
-							System.out.println(groupName);
 						}
 						
 						if(curso.containsKey("CourseId") && curso.containsKey("CourseName")) {
@@ -128,28 +125,33 @@ public class ConsultasMongoDB {
 							res.add(new Curso(id, name, emailuser, listgrupos));
 						}
 					}
-				}
+				
 			}
 			return res;
 		}
 		
 		public static List<User> buscarAlumnos(String CursoId, String GroupName){
 			MongoCollection<org.bson.Document> userdata = ManagerMongoDB.getusersCollection();
-			BasicDBObject dbo = new BasicDBObject("CourseId", CursoId);
-			dbo.append("GroupName", GroupName);
+			BasicDBObject dbo = new BasicDBObject("Courses.CourseId", CursoId);
+			dbo.append("Courses.CourseGroups.GroupName", GroupName);
 			List<Document> docUser= userdata.find(dbo).into(new ArrayList<Document>());
 			List<User> Users= new LinkedList<User>();
 			
 			if(docUser != null) {
 				for(Document Duser: docUser) {
-					//TODO comprobar si es profesor o alumno
 					if(Duser.containsKey("FirstName") && Duser.containsKey("LastName") && Duser.containsKey("email")) {
 						String name, lastname, email;
 						name= Duser.getString("FirstName");
 						lastname= Duser.getString("LastName");
 						email= Duser.getString("email");
-						User newUser= new User("", "", name, lastname, email, "", "", "");
-						Users.add(newUser);
+						User logindata= ConsultasMongoDB.getLoginData(email);
+
+						if(logindata != null) {
+							if(logindata.getRol().equalsIgnoreCase("Alumno")) {
+								User newUser= new User(logindata.getDni(), "", name, lastname, email, "", "", "");
+								Users.add(newUser);
+							}
+						}
 					}
 				}
 			}

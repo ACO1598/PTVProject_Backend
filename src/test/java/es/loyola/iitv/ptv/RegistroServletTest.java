@@ -17,7 +17,7 @@ import org.junit.Test;
 import es.loyola.iitv.ptv.servlets.RegistroServlet;
 
 public class RegistroServletTest {
-
+/*
 	@Test
 	public void test() throws IOException, ServletException{
 		HttpServletRequest request= mock(HttpServletRequest.class);
@@ -40,5 +40,5 @@ public class RegistroServletTest {
 		
 		System.out.println("Registro: " + stringWriter.toString());
 	}
-
+*/
 }

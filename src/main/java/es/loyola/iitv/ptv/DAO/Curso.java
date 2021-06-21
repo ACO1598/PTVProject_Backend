@@ -3,8 +3,8 @@ package es.loyola.iitv.ptv.DAO;
 import java.util.List;
 
 public class Curso {
-	private String cursoId, cursoName, userID;
-	private List<Grupo> listGrupos;
+	private String cursoId, Curso, userID;
+	private List<Grupo> Grupo;
 	
 	public Curso() {
 		this.setCursoName("");
@@ -16,9 +16,9 @@ public class Curso {
 	public Curso(String cursoId, String cursoName, String userID, List<Grupo> listGrupos) {
 		super();
 		this.cursoId = cursoId;
-		this.cursoName = cursoName;
+		this.Curso = cursoName;
 		this.userID = userID;
-		this.listGrupos = listGrupos;
+		this.Grupo = listGrupos;
 	}
 
 	public String getCursoId() {
@@ -30,11 +30,11 @@ public class Curso {
 	}
 
 	public String getCursoName() {
-		return cursoName;
+		return Curso;
 	}
 
 	public void setCursoName(String cursoName) {
-		this.cursoName = cursoName;
+		this.Curso = cursoName;
 	}
 
 	public String getUserID() {
@@ -46,11 +46,11 @@ public class Curso {
 	}
 
 	public List<Grupo> getListGrupos() {
-		return listGrupos;
+		return Grupo;
 	}
 
 	public void setListGrupos(List<Grupo> listGrupos) {
-		this.listGrupos = listGrupos;
+		this.Grupo = listGrupos;
 	}
 
 	@Override
@@ -58,8 +58,8 @@ public class Curso {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((cursoId == null) ? 0 : cursoId.hashCode());
-		result = prime * result + ((cursoName == null) ? 0 : cursoName.hashCode());
-		result = prime * result + ((listGrupos == null) ? 0 : listGrupos.hashCode());
+		result = prime * result + ((Curso == null) ? 0 : Curso.hashCode());
+		result = prime * result + ((Grupo == null) ? 0 : Grupo.hashCode());
 		result = prime * result + ((userID == null) ? 0 : userID.hashCode());
 		return result;
 	}
@@ -78,15 +78,15 @@ public class Curso {
 				return false;
 		} else if (!cursoId.equals(other.cursoId))
 			return false;
-		if (cursoName == null) {
-			if (other.cursoName != null)
+		if (Curso == null) {
+			if (other.Curso != null)
 				return false;
-		} else if (!cursoName.equals(other.cursoName))
+		} else if (!Curso.equals(other.Curso))
 			return false;
-		if (listGrupos == null) {
-			if (other.listGrupos != null)
+		if (Grupo == null) {
+			if (other.Grupo != null)
 				return false;
-		} else if (!listGrupos.equals(other.listGrupos))
+		} else if (!Grupo.equals(other.Grupo))
 			return false;
 		if (userID == null) {
 			if (other.userID != null)
@@ -98,8 +98,8 @@ public class Curso {
 
 	@Override
 	public String toString() {
-		return "Curso [cursoId=" + cursoId + ", cursoName=" + cursoName + ", userID=" + userID + ", listGrupos="
-				+ listGrupos + "]";
+		return "Curso [cursoId=" + cursoId + ", cursoName=" + Curso + ", userID=" + userID + ", listGrupos="
+				+ Grupo + "]";
 	}
 	
 	

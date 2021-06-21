@@ -1,5 +1,6 @@
 package es.loyola.iitv.ptv.servlets;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDate;
@@ -43,8 +44,12 @@ public class RegistroServlet extends HttpServlet{
 		JSONObject result= new JSONObject();
 		JSONObject session= new JSONObject();
 		
-		String request= req.getParameter("request");
-		System.out.println(request);
+		//String request= req.getParameter("request");
+		
+		BufferedReader myRequest = req.getReader();
+		String request = new String();
+		for(String line; (line = myRequest.readLine()) != null; request+= line);
+		
 
 		User usuario= null;
 		
@@ -63,7 +68,8 @@ public class RegistroServlet extends HttpServlet{
 						throw new NullPointerException("password vacio");
 					}
 					//De momento todo nuevo usuario es un alumno de forma predeterminada
-					newlogindata.append("Rol", "Alumno");
+					usuario.setRol("Alumno");
+					newlogindata.append("Rol", usuario.getRol());
 					newlogindata.append("Token", usuario.generarToken());
 					//TODO cambiar las fechas
 					newlogindata.append("LastAction", LocalDate.now().toString());					
@@ -90,7 +96,7 @@ public class RegistroServlet extends HttpServlet{
 						result.put("FirstName", usuario.getFirstname());
 						result.put("LastName", usuario.getLastname());
 						result.put("Token", usuario.getToken());
-						result.put("Rol", usuario.getRol());
+						result.put("role", usuario.getRol());
 						respuesta.put("result", result);
 						session.put("User", usuario.getEmail());
 						session.put("Token", usuario.getToken());
@@ -123,7 +129,7 @@ public class RegistroServlet extends HttpServlet{
 		catch (NullPointerException e) {
 			respuesta.put("status", "ERROR");
 			result.put("code", "PTV05");
-			result.put("errormsg", e.toString());
+			result.put("errormsg", usuario.getFirstname());
 			respuesta.put("result", result);
 			session.put("User", usuario.getEmail());
 			session.put("Token", usuario.getToken());

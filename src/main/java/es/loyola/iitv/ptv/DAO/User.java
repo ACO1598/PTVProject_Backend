@@ -51,8 +51,8 @@ public class User {
 					throw new NullPointerException("Error al copiar el password");
 				}
 			}
-			if(json.has("user")) {
-				email=  json.getString("user");
+			if(json.has("usuario")) {
+				email=  json.getString("usuario");
 				if(!email.isEmpty()) {
 					this.setEmail(email);
 				}else {
@@ -139,6 +139,7 @@ public class User {
 		random.nextBytes(bytes);
 		Encoder encoder= Base64.getUrlEncoder().withoutPadding();
 		String token= encoder.encodeToString(bytes);
+		this.token = token;
 		return token;
 	}
 	

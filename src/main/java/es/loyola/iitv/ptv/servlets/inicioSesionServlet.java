@@ -1,5 +1,6 @@
 package es.loyola.iitv.ptv.servlets;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.stream.Collectors;
@@ -10,9 +11,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.bson.json.JsonParseException;
 import org.json.JSONObject;
 
 import es.loyola.iitv.ptv.Connection.ConsultasMongoDB;
+import es.loyola.iitv.ptv.Connection.Respuesta;
 import es.loyola.iitv.ptv.DAO.User;
 
 
@@ -27,13 +30,24 @@ public class InicioSesionServlet extends HttpServlet{
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("application/json");
+		resp.setHeader("Cache-Control", "no-cache");
+		resp.setHeader("Cache-Contorl", "no-store");
 		PrintWriter writer= resp.getWriter();
 		JSONObject respuesta= new JSONObject();
-		JSONObject result= new JSONObject();
-		JSONObject session= new JSONObject();
 		
-		String request= req.getParameter("request");
-
+		String request = new String();
+		
+		//USE this for normal use
+		BufferedReader myRequest = req.getReader();
+		for(String line; (line = myRequest.readLine()) != null; request+= line);
+		
+		//Use this for testing
+		
+		//request = req.getParameter("data");
+		
+		
+		
+		
 		User usuario= null;
 		
 		try {
@@ -47,63 +61,36 @@ public class InicioSesionServlet extends HttpServlet{
 				if(userLoginData != null && userUsersData != null) {
 					if(userLoginData.getPassword().equals(usuario.getPassword()) && userLoginData.getEmail().equals(usuario.getEmail())) {
 						if(ConsultasMongoDB.updateLoginDoc(userLoginData)) {
-							respuesta.put("status", "ok");
+							JSONObject result= new JSONObject();
 							result.put("FirstName", userUsersData.getFirstname());
 							result.put("LastName", userUsersData.getLastname());
 							result.put("Token", userLoginData.getToken());
 							result.put("Rol", userLoginData.getRol());
-							respuesta.put("result", result);
-							session.put("User", userLoginData.getEmail());
-							session.put("Token", userLoginData.getToken());
-							session.put("role", userLoginData.getRol());
-							respuesta.put("session", session);
+							respuesta= Respuesta.prepMensaje(result, userLoginData.getEmail(), userLoginData.getToken(), userLoginData.getRol());
 						}else {
-							respuesta.put("status", "ERROR");
-							result.put("code", "PTV03");
-							result.put("errormsg", "LoginData no actualizado");
-							respuesta.put("result", result);
-							session.put("user", usuario.getEmail());
-							session.put("Token", usuario.getToken());
-							session.put("role", usuario.getRol());
-							respuesta.put("session", session);
+							respuesta= Respuesta.prepMensajeError("PTV03", "LoginData no actualizado", usuario.getEmail(), usuario.getToken(),  usuario.getRol());
 						}
 					}else {
-						respuesta.put("status", "ERROR");
-						result.put("code", "PTV03");
-						result.put("errormsg", "Contraseña o email no concuerdan");
-						respuesta.put("result", result);
-						session.put("user", usuario.getEmail());
-						session.put("Token", usuario.getToken());
-						session.put("role", usuario.getRol());
-						respuesta.put("session", session);
+						respuesta= Respuesta.prepMensajeError("PTV03", "Contraseña o email no concuerdan", usuario.getEmail(), usuario.getToken(), usuario.getRol());
 					}
 				}
 			} else {
 				throw new NullPointerException("empty request");
 			}
 		}catch (NullPointerException e) {  
-			respuesta.put("status", "ERROR");
-			result= new JSONObject();
-			result.put("code", "PTV04");
-			result.put("errormsg", e.toString());
-			respuesta.put("result", result);
+			respuesta= Respuesta.prepMensajeError("PTV04", e.toString(), "", "", "");
+
+			/*
 			session= new JSONObject();
-			session.put("user", usuario.getEmail());
+			session.put("user", );
 			session.put("Token", usuario.getToken());
 			session.put("role", usuario.getRol());
 			respuesta.put("session", session);
+			*/
+			
 		}
-		catch (ClassCastException e) {                                          
-			respuesta.put("status", "ERROR");
-			result= new JSONObject();
-			result.put("code", "PTV01");
-			result.put("errormsg", e.toString());
-			respuesta.put("result", result);
-			session= new JSONObject();
-			session.put("user", usuario.getEmail());
-			session.put("Token", usuario.getToken());
-			session.put("role", usuario.getRol());
-			respuesta.put("session", session);
+		catch (ClassCastException e) {        
+			respuesta= Respuesta.prepMensajeError("PTV01", e.toString(), "", "", "");
 		}
 		writer.write(respuesta.toString());
 	}

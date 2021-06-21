@@ -1,3 +1,5 @@
 es\loyola\iitv\ptv\AllTests.class
 es\loyola\iitv\ptv\InicioSesionTest.class
+es\loyola\iitv\ptv\ListadoCursosTests.class
 es\loyola\iitv\ptv\RegistroServletTest.class
+es\loyola\iitv\ptv\ListadoAlumnosTests.class

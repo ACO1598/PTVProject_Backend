@@ -14,10 +14,14 @@ import com.mongodb.client.result.UpdateResult;
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Updates.*;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import es.loyola.iitv.ptv.DAO.Curso;
 import es.loyola.iitv.ptv.DAO.Grupo;
@@ -88,7 +92,9 @@ public class ConsultasMongoDB {
 			MongoCollection<org.bson.Document> logindata = ManagerMongoDB.getloginCollection();
 			
 			String emailuser= userlogindata.getEmail();
-			String currentTime= LocalDate.now().toString();
+			Date date= new Date();
+			SimpleDateFormat format= new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+			String currentTime= format.format(date);
 			String token= userlogindata.getToken();
 			if((emailuser != null && emailuser != "") || (token != null && token != "")) {
 				logindata.updateOne(eq("email", emailuser), set("Token", token));
@@ -157,5 +163,34 @@ public class ConsultasMongoDB {
 			}
 			
 			return Users;
+		}
+		
+		public static boolean comprobarToken(String token) throws ParseException {
+			MongoCollection<org.bson.Document> logindata = ManagerMongoDB.getloginCollection();
+			BasicDBObject dbo = new BasicDBObject("Token", token);
+			Document docUser= logindata.find(dbo).first();
+			boolean check= false;
+			
+			if(docUser != null) {
+				Date date= new Date();
+				SimpleDateFormat format= new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+				String currentTime= format.format(date);
+				
+				String stringToken= docUser.getString("LastAction");
+				Date tokenDate= format.parse(stringToken);
+				
+				long diff= date.getTime() - tokenDate.getTime();
+				TimeUnit time= TimeUnit.MINUTES;
+				diff= time.convert(diff, TimeUnit.MILLISECONDS);
+				
+				if(diff <= 2) {
+					check= false;
+				}else{
+					check= true;
+					logindata.updateOne(eq("Token", token), set("LastAction", currentTime));
+				}
+			}
+			
+			return check;
 		}
 }

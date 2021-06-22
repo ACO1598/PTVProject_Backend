@@ -3,6 +3,7 @@ package es.loyola.iitv.ptv.servlets;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
 
 import es.loyola.iitv.ptv.Connection.ConsultasMongoDB;
+import es.loyola.iitv.ptv.Connection.Respuesta;
 import es.loyola.iitv.ptv.DAO.Curso;
 import es.loyola.iitv.ptv.DAO.Grupo;
 import es.loyola.iitv.ptv.DAO.User;
@@ -34,8 +36,6 @@ public class ListadoAlumnosServlet extends HttpServlet{
 		resp.setHeader("Cache-Contorl", "no-store");
 		PrintWriter writer= resp.getWriter();
 		JSONObject respuesta= new JSONObject();
-		JSONObject result= new JSONObject();
-		JSONObject session= new JSONObject();
 		
 		String request = new String();
 		
@@ -53,66 +53,39 @@ public class ListadoAlumnosServlet extends HttpServlet{
 				String groupName, cursoId;
 				
 				if(jrequest.has("Token")) {
-					
-				}
-				
-				if(jrequest.has("Curso") && jrequest.has("Grupo")){
-					groupName= (String) jrequest.get("Grupo");
-					cursoId= (String) jrequest.get("Curso");
-					
-					List<User> Users= ConsultasMongoDB.buscarAlumnos(cursoId, groupName);
-					
-					if(Users.isEmpty()) {
-						respuesta.put("status", "ERROR");
-						result.put("code", "PTV01");
-						result.put("errormsg", "No hay alumnos con esta combinacion");
-						respuesta.put("result", Users);
-						session.put("user", "");
-						session.put("Token", "");
-						session.put("role", "");
-						respuesta.put("result",result);
-						respuesta.put("session", session);
+					if(ConsultasMongoDB.comprobarToken(jrequest.getString("Token"))) {
+						if(jrequest.has("Curso") && jrequest.has("Grupo")){
+							groupName= (String) jrequest.get("Grupo");
+							cursoId= (String) jrequest.get("Curso");
+							
+							List<User> Users= ConsultasMongoDB.buscarAlumnos(cursoId, groupName);
+							
+							if(Users.isEmpty()) {
+								respuesta= Respuesta.prepMensajeError("PTV01", "No hay alumnos con esta combinacion", "", jrequest.getString("Token"), "");
+							}else {
+								JSONObject jsonresult= new JSONObject();
+								jsonresult.put("ListAlumnos", Users);
+								respuesta= Respuesta.prepMensaje(jsonresult, "", jrequest.getString("Token"), "");
+							}
+							
+						}else {
+							throw new NullPointerException("empty request 1");
+						}
 					}else {
-						respuesta.put("status", "ok");
-						result.put("ListAlumnos", Users);
-						respuesta.put("result", result);
-						//TODO resolver el tema de falta de token/email usuario ejecutando el Servlet
-//						session.put("User", userLoginData.getEmail());
-//						session.put("Token", userLoginData.getToken());
-//						session.put("role", userLoginData.getRol());
-						respuesta.put("session", session);
+						respuesta= Respuesta.prepMensajeError("PTV02", "Token expirado", "", jrequest.getString("Token"), "");
 					}
-					
 				}else {
-					throw new NullPointerException("empty request 1");
+					respuesta= Respuesta.prepMensajeError("PTV02", "Token expirado", "", jrequest.getString("Token"), "");
 				}
-				
-			}else {
-				throw new NullPointerException("empty request 2");
 			}
 		}catch (NullPointerException e) {
-			respuesta.put("status", "ERROR");
-			result= new JSONObject();
-			result.put("code", "PTV04");
-			result.put("errormsg", e.toString());
-			respuesta.put("result", result);
-			session= new JSONObject();
-			session.put("user", "");
-			session.put("Token", "");
-			session.put("role", "");
-			respuesta.put("session", session);
+			respuesta= Respuesta.prepMensajeError("PTV04", "Error", "", "", "");
 		}
-		catch (ClassCastException e) {                                          
-			respuesta.put("status", "ERROR");
-			result= new JSONObject();
-			result.put("code", "PTV01");
-			result.put("errormsg", e.toString());
-			respuesta.put("result", result);
-			session= new JSONObject();
-//			session.put("user", usuario.getEmail());
-//			session.put("Token", usuario.getToken());
-//			session.put("role", usuario.getRol());
-			respuesta.put("session", session);
+		catch (ClassCastException e) {       
+			respuesta= Respuesta.prepMensajeError("PTV01", e.toString(), "", "", "");
+		}
+		catch (ParseException e) {
+			respuesta= Respuesta.prepMensajeError("PTV04", "Error", "", "", "");
 		}
 		writer.write(respuesta.toString());
 	}

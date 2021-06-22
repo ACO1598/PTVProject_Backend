@@ -3,7 +3,9 @@ package es.loyola.iitv.ptv.servlets;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
@@ -71,8 +73,10 @@ public class RegistroServlet extends HttpServlet{
 					usuario.setRol("Alumno");
 					newlogindata.append("Rol", usuario.getRol());
 					newlogindata.append("Token", usuario.generarToken());
-					//TODO cambiar las fechas
-					newlogindata.append("LastAction", LocalDate.now().toString());					
+					Date date= new Date();
+					SimpleDateFormat format= new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+					String currentTime= format.format(date);
+					newlogindata.append("LastAction", currentTime);					
 					
 					Document newUserdata= new Document("Dni", usuario.getDni());
 					if(!usuario.getFirstname().isEmpty()) {
@@ -122,8 +126,6 @@ public class RegistroServlet extends HttpServlet{
 					session.put("role", usuario.getRol());
 					respuesta.put("session", session);
 				}
-			} else {
-				throw new NullPointerException("request vacio");
 			}
 		}
 		catch (NullPointerException e) {

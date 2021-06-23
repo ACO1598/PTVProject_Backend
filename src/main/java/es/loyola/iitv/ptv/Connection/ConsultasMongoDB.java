@@ -113,25 +113,27 @@ public class ConsultasMongoDB {
 			List<Curso> res= new LinkedList<Curso>();
 			
 			if(docUser != null ) {
-				
 					List<Document> cursos= docUser.getList("Courses", Document.class);
-					for(Document curso:cursos){
-						List<Document> grupos= curso.getList("CourseGroups", Document.class);
-						List<Grupo> listgrupos= new LinkedList<Grupo>();
-						
-						for(Document grupo:grupos) {
-							Grupo grup= new Grupo(grupo.getString("GroupName"), grupo.getString("GroupDescription"));
-							listgrupos.add(grup);
-						}
-						
-						if(curso.containsKey("CourseId") && curso.containsKey("CourseName")) {
-							String id= curso.getString("CourseId");
-							String name= curso.getString("CourseName");
+					if(!cursos.isEmpty()) {
+						for(Document curso:cursos){
+							List<Document> grupos= curso.getList("CourseGroups", Document.class);
+							List<Grupo> listgrupos= new LinkedList<Grupo>();
 							
-							res.add(new Curso(id, name, emailuser, listgrupos));
+							for(Document grupo:grupos) {
+								Grupo grup= new Grupo(grupo.getString("GroupName"), grupo.getString("GroupDescription"));
+								listgrupos.add(grup);
+							}
+							
+							if(curso.containsKey("CourseId") && curso.containsKey("CourseName")) {
+								String id= curso.getString("CourseId");
+								String name= curso.getString("CourseName");
+								
+								res.add(new Curso(id, name, emailuser, listgrupos));
+							}
 						}
+					}else {
+						res= null;
 					}
-				
 			}
 			return res;
 		}
@@ -184,11 +186,25 @@ public class ConsultasMongoDB {
 				diff= time.convert(diff, TimeUnit.MILLISECONDS);
 				
 				if(diff <= 2) {
-					check= false;
-				}else{
 					check= true;
 					logindata.updateOne(eq("Token", token), set("LastAction", currentTime));
+				}else{
+					check= false;
+					
 				}
+			}
+			
+			return check;
+		}
+		
+		public static boolean comprobarProfesor(String email) {
+			boolean check= false;
+			
+			User userLoginData= ConsultasMongoDB.getLoginData(email);
+			System.out.println(userLoginData.getRol());
+			
+			if(userLoginData.getRol().equals("Profesor")) {
+				check= true;
 			}
 			
 			return check;

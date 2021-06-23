@@ -45,9 +45,6 @@ public class InicioSesionServlet extends HttpServlet{
 		
 		//request = req.getParameter("data");
 		
-		
-		
-		
 		User usuario= null;
 		
 		try {
@@ -74,20 +71,9 @@ public class InicioSesionServlet extends HttpServlet{
 						respuesta= Respuesta.prepMensajeError("PTV03", "Contraseña o email no concuerdan", usuario.getEmail(), usuario.getToken(), usuario.getRol());
 					}
 				}
-			} else {
-				throw new NullPointerException("empty request");
 			}
 		}catch (NullPointerException e) {  
 			respuesta= Respuesta.prepMensajeError("PTV04", e.toString(), "", "", "");
-
-			/*
-			session= new JSONObject();
-			session.put("user", );
-			session.put("Token", usuario.getToken());
-			session.put("role", usuario.getRol());
-			respuesta.put("session", session);
-			*/
-			
 		}
 		catch (ClassCastException e) {        
 			respuesta= Respuesta.prepMensajeError("PTV01", e.toString(), "", "", "");
